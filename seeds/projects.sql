@@ -7,6 +7,23 @@
 
 INSERT INTO projects (title, category, description, bullets, tech_stack, github_url, live_url, collaborator, is_featured, display_order) VALUES
 (
+    'RAG-Powered Portfolio Chatbot',
+    'personal',
+    '3-repo Go system powering this portfolio''s AI chat. SSE-streamed LLM responses, hybrid pgvector + full-text retrieval (Reciprocal Rank Fusion) over Google Gemini embeddings on Neon PostgreSQL.',
+    '[
+        "Built a 3-service system: portfolio-store (Neon PostgreSQL + pgvector), rag-chatbot (Go API on Render), and portfolio-website (Next.js on Vercel)",
+        "Hybrid retrieval: pgvector cosine similarity + Postgres full-text search merged via Reciprocal Rank Fusion (RRF) — top-5 chunks per query at ~350-500 tokens of context",
+        "Pluggable LLM backends (Groq openai/gpt-oss-120b primary, Gemini fallback) with SSE token streaming, prompt-injection guardrails, and query contextualization for pronoun resolution",
+        "Topic filter uses the minimum vector distance across retrieved chunks to redirect off-topic questions without an LLM call"
+    ]'::jsonb,
+    ARRAY['Go', 'PostgreSQL', 'pgvector', 'Gemini', 'Groq', 'SSE', 'Neon', 'Render', 'Next.js'],
+    'https://github.com/AG-AGENT47/rag-chatbot',
+    '#chat',
+    NULL,
+    TRUE,
+    0
+),
+(
     'Graph Learning for Heart Disease Prediction',
     'research',
     'Graduate research project (BMI/CS 775, UW-Madison) using graph neural networks to model non-i.i.d. clinical relationships for heart disease risk assessment on the UCI Heart Disease dataset.',
@@ -92,7 +109,7 @@ INSERT INTO projects (title, category, description, bullets, tech_stack, github_
         "Cut query latency 1.47x and index build time 2.38x via shared-memory LUT caching, OpenMP k-means, and CUDA streams; benchmarked on SIFT1M with NVIDIA Nsight Compute on the Euler HPC cluster"
     ]'::jsonb,
     ARRAY['CUDA', 'C++', 'OpenMP', 'Thrust', 'CUB', 'CMake'],
-    NULL,
+    'https://github.com/AG-AGENT47/parallel-vector-database',
     NULL,
     NULL,
     TRUE,

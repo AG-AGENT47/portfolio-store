@@ -31,6 +31,9 @@ psql "$URL" -v ON_ERROR_STOP=1 -f "$REPO_ROOT/migrations/004_update_featured_pro
 echo "== migration 006 (project metadata fixes + GPU rename) =="
 psql "$URL" -v ON_ERROR_STOP=1 -f "$REPO_ROOT/migrations/006_project_metadata_fixes.sql"
 
+echo "== migration 007 (project GitHub links + RAG live demo -> #chat) =="
+psql "$URL" -v ON_ERROR_STOP=1 -f "$REPO_ROOT/migrations/007_project_links.sql"
+
 for s in personal_info skills experience education projects; do
   echo "== seed: $s =="
   psql "$URL" -v ON_ERROR_STOP=1 -f "$REPO_ROOT/seeds/$s.sql"
