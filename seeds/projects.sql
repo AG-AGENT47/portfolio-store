@@ -20,7 +20,7 @@ INSERT INTO projects (title, category, description, bullets, tech_stack, github_
     'https://heart-disease-gnn-veoy8p8y2h6z2ahnszpcnm.streamlit.app',
     'Prof. Anthony Gitter, Prof. Sushmita Roy',
     TRUE,
-    1
+    2
 ),
 (
     'Patterning Protein Localisation in Endothelial Cells',
@@ -35,7 +35,7 @@ INSERT INTO projects (title, category, description, bullets, tech_stack, github_
     NULL,
     'Prof. Syamantak Majumder',
     TRUE,
-    2
+    3
 ),
 (
     'Deep Learning Framework for ICP Prediction using OCT Scans',
@@ -50,7 +50,7 @@ INSERT INTO projects (title, category, description, bullets, tech_stack, github_
     NULL,
     'Prof. S. Raman',
     FALSE,
-    3
+    6
 ),
 (
     'ML Techniques for Alzheimer''s Disease Diagnosis',
@@ -64,7 +64,7 @@ INSERT INTO projects (title, category, description, bullets, tech_stack, github_
     NULL,
     NULL,
     'Prof. Bharat Richhariya',
-    FALSE,
+    TRUE,
     4
 ),
 (
@@ -80,23 +80,23 @@ INSERT INTO projects (title, category, description, bullets, tech_stack, github_
     NULL,
     'Dr. Mukesh Kumar Rohil',
     FALSE,
-    5
+    7
 ),
 (
-    'GPU-Accelerated ANN Search with IVF-PQ Indexing',
+    'GPU-Accelerated Vector Search Engine',
     'coursework',
-    'Graduate HPC project (ME/CS/ECE 759, Spring 2026) — implementing a GPU-accelerated approximate nearest neighbor search engine using IVF-PQ, the algorithm powering production vector databases like FAISS and Milvus.',
+    'Graduate HPC project (ME/CS/ECE 759) — a GPU-accelerated approximate nearest neighbor search engine implementing FAISS-style IVF-PQ, the algorithm powering production vector databases like FAISS and Milvus.',
     '[
-        "Implementing IVF-PQ (Inverted File Index with Product Quantization) algorithm in CUDA C/C++ — the same core algorithm used by production vector databases FAISS, Milvus, and Pinecone for billion-scale ANN search",
-        "Applying GPU performance engineering: shared memory optimization for ADC distance kernels, memory coalescing for PQ code access, warp divergence management, Thrust/CUB sorting/scanning, and CUDA streams",
-        "Benchmarking 5 optimization stages (CPU baseline → fully optimized GPU IVF-PQ) on SIFT1M dataset using NVIDIA Nsight Compute profiling on Euler HPC cluster with Slurm job scheduling"
+        "Built a 5-stage GPU ANN pipeline (CUDA, OpenMP) implementing FAISS-style IVF-PQ (Inverted File Index with Product Quantization) — 127.8x speedup over the CPU baseline",
+        "Designed a shared-memory-tiled CUDA kernel that cut global-memory traffic 32x and raised query throughput 6x on 1M vectors",
+        "Cut query latency 1.47x and index build time 2.38x via shared-memory LUT caching, OpenMP k-means, and CUDA streams; benchmarked on SIFT1M with NVIDIA Nsight Compute on the Euler HPC cluster"
     ]'::jsonb,
     ARRAY['CUDA', 'C++', 'OpenMP', 'Thrust', 'CUB', 'CMake'],
     NULL,
     NULL,
     NULL,
-    FALSE,
-    6
+    TRUE,
+    1
 ),
 (
     'E-commerce Management System',
@@ -111,7 +111,7 @@ INSERT INTO projects (title, category, description, bullets, tech_stack, github_
     NULL,
     NULL,
     FALSE,
-    7
+    8
 ),
 (
     'FlashCard Application',
@@ -127,7 +127,7 @@ INSERT INTO projects (title, category, description, bullets, tech_stack, github_
     NULL,
     NULL,
     FALSE,
-    8
+    9
 ),
 (
     'Mound Data Structure (MoundDSA)',
@@ -142,7 +142,7 @@ INSERT INTO projects (title, category, description, bullets, tech_stack, github_
     NULL,
     NULL,
     FALSE,
-    9
+    10
 ),
 (
     'Compiler Frontend — Lexer and Parser',
@@ -158,7 +158,7 @@ INSERT INTO projects (title, category, description, bullets, tech_stack, github_
     NULL,
     'Aryaman Chauhan, Devansh, Arnav Gujarathi, Akshaj Dixit, Tanushi Garg',
     FALSE,
-    10
+    11
 )
 ON CONFLICT (title) DO UPDATE
     SET description   = EXCLUDED.description,

@@ -2,19 +2,34 @@
 -- Run: psql $NEON_DATABASE_URL -f seeds/experience.sql
 -- ON CONFLICT (company, role, start_date) DO UPDATE: upsert — safe to re-run.
 -- bullets is JSONB array of strings — each bullet is one self-contained achievement.
--- display_order = 1 is most recent (upcoming Uber 2026 shown first).
+-- display_order = 1 is most recent.
 
 INSERT INTO experience (company, role, location, start_date, end_date, is_current, description, bullets, display_order) VALUES
 (
-    'Uber',
-    'Software Engineer Intern',
-    'Hyderabad, India',
-    '2026-05-11',
+    'University of Wisconsin-Madison',
+    'Teaching Assistant',
+    'Madison, Wisconsin',
+    '2026-09-02',
     NULL,
-    FALSE,
-    'Upcoming Summer 2026 SWE internship at Uber.',
+    TRUE,
+    'Teaching assistant for Data Management for Data Science.',
     '[]'::jsonb,
     1
+),
+(
+    'Uber',
+    'Software Engineer Intern',
+    'Sunnyvale, California',
+    '2026-05-11',
+    '2026-07-31',
+    FALSE,
+    'Summer 2026 internship on Uber''s Customer Obsession org.',
+    '[
+        "Architected a self-service config approval workflow end-to-end, eliminating code deploys to onboard new configuration types",
+        "Replaced a manual email-based approval process, adding an audit trail and per-type RBAC where the prior system had none",
+        "Built transactional draft-to-live promotion across 14 gRPC RPCs, using pessimistic locking to eliminate concurrent races"
+    ]'::jsonb,
+    2
 ),
 (
     'Uber',
@@ -23,14 +38,14 @@ INSERT INTO experience (company, role, location, start_date, end_date, is_curren
     '2024-07-01',
     '2025-06-30',
     FALSE,
-    'Backend engineering on Uber AI Solutions — knowledge work marketplace and developer tooling.',
+    'Backend engineering on Uber''s AI Solutions org — knowledge work marketplace and developer tooling.',
     '[
         "Developed an upcoming knowledge work marketplace for 5+ countries covering data annotation and ML model training workflows",
         "Implemented a rate-card system in Java SpringBoot using MVC architecture; developed gRPC APIs for cross-service integration",
         "Created a Kafka-based notification engine with optimized cadence scheduling — improved customer retention funnel 3X",
         "Built a debug tool with 7 automated checks for Uber AI Solutions — reduced developer dependency on recurring issues by 80%"
     ]'::jsonb,
-    2
+    3
 ),
 (
     'University of Saskatchewan',
@@ -45,7 +60,7 @@ INSERT INTO experience (company, role, location, start_date, end_date, is_curren
         "Automated daily cattle weighing via RFID-based (Radio Frequency Identification) data collection and analysis system — saved 3,000+ hours/year of manual work",
         "Revamped cattle management database with 6,600+ entries — achieved 90% faster queries via optimized genealogy links and indexing"
     ]'::jsonb,
-    3
+    4
 ),
 (
     'Indian Institute of Technology, Ropar',
@@ -59,7 +74,7 @@ INSERT INTO experience (company, role, location, start_date, end_date, is_curren
         "Trained and evaluated ML models (machine learning classification algorithms) for cattle health monitoring using farm-based IoT sensor data",
         "Analyzed 4,000+ data points for cattle behavior prediction including movement patterns and estrus detection"
     ]'::jsonb,
-    4
+    5
 ),
 (
     'MapmyIndia',
@@ -73,7 +88,7 @@ INSERT INTO experience (company, role, location, start_date, end_date, is_curren
         "Built a web app for delivery executives using the Traveling Salesman Problem (TSP) algorithm for optimal multi-stop trip routing",
         "Integrated an interactive map API (HTML, CSS, JavaScript) with dynamic resizing and custom marker placement features"
     ]'::jsonb,
-    5
+    6
 )
 ON CONFLICT (company, role, start_date) DO UPDATE
     SET location      = EXCLUDED.location,

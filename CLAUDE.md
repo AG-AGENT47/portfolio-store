@@ -40,8 +40,9 @@ Location: Madison, Wisconsin
    Nov 2020 – May 2025
    GPA: 9.01/10
 
-UW-Madison Courses (Fall 2025): CS 540 Intro to AI (A), CS 760 Machine Learning (A), CS 775 Computational Network Biology (A)
-UW-Madison Courses (Spring 2026, in progress): CS 759 HPC for Applications in Engineering, CS 774 Data Exploration Cleaning & Integration
+UW-Madison Courses (completed): CS 540 Intro to AI, CS 760 Machine Learning, CS 775 Computational Network Biology,
+CS 759 HPC for Applications in Engineering, CS 774 Data Exploration Cleaning & Integration
+UW-Madison Courses (Fall 2026, in progress): AI Agents, Next-Generation Data Systems, Learning-Based Methods for Computer Vision
 
 BITS Pilani CS Courses: Data Structures & Algorithms, Database Systems, OOP, Computer Networks,
 Operating Systems, Microprocessors & Interfacing, Computer Architecture, Theory of Computation,
@@ -55,25 +56,34 @@ BITS graduation: DISTINCTION, date of approval 30-JUN-2025
 ## Professional Experience
 
 ```
-1. Uber — Software Intern
-   Jul 2024 – Jun 2025
+0. University of Wisconsin–Madison — Teaching Assistant (CURRENT)
+   Sep 2026 – present, Madison, WI — TA for "Data Management for Data Science"
+
+1. Uber — Software Engineer Intern (Customer Obsession)
+   May 2026 – Jul 2026, Sunnyvale, California
+   - Architected a self-service config approval workflow end-to-end — eliminated code deploys to onboard new config types
+   - Replaced a manual email-based approval process; added an audit trail and per-type RBAC where there was none
+   - Built transactional draft-to-live promotion across 14 gRPC RPCs with pessimistic locking to eliminate concurrent races
+
+2. Uber — Software Intern (AI Solutions)
+   Jul 2024 – Jun 2025, Hyderabad, India
    - Developed an upcoming knowledge work marketplace for 5+ countries (data annotation + ML model training)
    - Implemented a rate-card system in Java SpringBoot using MVC; developed gRPC APIs for service integration
    - Created a Kafka-based notification engine with optimized cadence scheduling — improved customer retention funnel 3X
    - Built a debug tool with 7 automated checks for Uber AI Solutions — reduced developer dependency on recurring issues by 80%
 
-2. University of Saskatchewan — Mitacs Research Intern
+3. University of Saskatchewan — Mitacs Research Intern
    May 2023 – Aug 2023
    - Collaborated with Prof. Jaswant Singh (biomedical sciences) on cattle health and reproduction data analysis
    - Automated daily cattle weighing via RFID-based data collection and analysis system — saved 3,000+ hrs/year
    - Revamped cattle management database (6,600+ entries) — 90% faster queries via genealogy links
 
-3. Indian Institute of Technology, Ropar — Research Intern
+4. Indian Institute of Technology, Ropar — Research Intern
    Jul 2022 – Sep 2022
    - Trained and evaluated ML models for cattle health monitoring using farm-based IoT sensor data
    - Analyzed 4,000+ data points for cattle behavior prediction: movement patterns and estrus detection
 
-4. MapmyIndia — Software Intern
+5. MapmyIndia — Software Intern
    May 2022 – Jul 2022
    - Built a web app for delivery executives using the traveling salesman algorithm for optimal trip routing
    - Integrated an interactive map API (HTML, CSS, JavaScript) with resizing and custom marker placement
@@ -106,15 +116,18 @@ BITS graduation: DISTINCTION, date of approval 30-JUN-2025
    - T-9 phone keypad mapped to mathematical/Greek symbols for fast formula entry in text editors
    - Python Tkinter GUI with frequency-based prediction dictionary
 
-6. GPU-Accelerated ANN Search with IVF-PQ Indexing (ME/CS/ECE 759 HPC, Spring 2026, in progress)
-   - Implementing IVF-PQ (same algorithm as FAISS/Milvus/Pinecone) in CUDA C/C++
-   - CUDA shared memory optimization, memory coalescing, warp divergence, Thrust/CUB, OpenMP
-   - Benchmarking on SIFT1M; profiling with NVIDIA Nsight Compute on Euler HPC cluster (Slurm)
-   - Due: 2026-05-05
+6. GPU-Accelerated Vector Search Engine (ME/CS/ECE 759 HPC — completed)
+   - 5-stage GPU ANN pipeline (CUDA, OpenMP) implementing FAISS-style IVF-PQ — 127.8x speedup over CPU baseline
+   - Shared-memory-tiled CUDA kernel: cut global-memory traffic 32x, raised query throughput 6x on 1M vectors
+   - Cut query latency 1.47x and index build time 2.38x (shared-memory LUT caching, OpenMP k-means, CUDA streams); SIFT1M, Nsight Compute, Euler cluster
 
 7. E-commerce Management System (Coursework)
    - Built a MySQL-based e-commerce platform with product browsing and order placement
    - Designed a Python Tkinter GUI for order tracking, payment history, and feedback
+
+Also in the DB (not on the résumé): RAG-Powered Portfolio Chatbot (this system), FlashCard Application,
+Mound Data Structure, Compiler Frontend, T-9 Predictive Formula Entry. Featured on the homepage:
+RAG Chatbot, GPU Vector Search, Graph Learning, Patterning Protein, Alzheimer's ML (5).
 ```
 
 ---
@@ -133,9 +146,10 @@ BITS graduation: DISTINCTION, date of approval 30-JUN-2025
 ## Technical Skills
 
 ```
-Languages:  Java, Python, C/C++, CUDA, SQL, HTML, JavaScript
-Frameworks: SpringBoot, OpenCV, TensorFlow, PyTorch, Scikit-learn, GraphSAGE, Node2Vec, Pandas, NumPy, Thrust/CUB
-Tools:      MVC, Kafka, Mockito, FastAPI, Streamlit, gRPC, REST, Docker, Git, Agile, JIRA, OpenMP, CMake
+Languages:  Java, Go, Python, CUDA, C/C++, SQL, HTML, JavaScript
+Frameworks: SpringBoot, GORM, Protobuf, OpenCV, TensorFlow, PyTorch, Scikit-learn, GraphSAGE, Node2Vec, Pandas, NumPy, Thrust/CUB
+Tools:      MVC, Kafka, Claude Code, Mockito, FastAPI, Streamlit, gRPC, REST, Docker, Git, Agile, JIRA, OpenMP, CMake
+Concepts:   Agentic Development, Microservices, Monorepo
 ```
 
 ---
@@ -181,24 +195,33 @@ achievements (id UUID, title TEXT, organization TEXT, description TEXT,
 ### RAG + Metrics Tables
 
 ```sql
--- Chunked content for RAG retrieval
--- embedding VECTOR(512): Voyage AI voyage-3-lite dimensions (fixed at model selection)
+-- Chunked content for RAG retrieval (50 rows, seeded from seeds/knowledge_base.sql)
+-- embedding VECTOR(768): Google Gemini gemini-embedding-001 output dims.
+--   Migration 003 created this as VECTOR(512) for Voyage voyage-3-lite;
+--   migration 005 dropped+re-added it as VECTOR(768) for Gemini.
 knowledge_base (id UUID, content TEXT, source TEXT, source_type TEXT,
-                metadata JSONB, embedding VECTOR(1024), created_at)
+                metadata JSONB, embedding VECTOR(768), created_at)
 -- source_type: 'experience' | 'project' | 'education' | 'achievement' | 'skill' | 'personal'
--- IVFFlat cosine index: ORDER BY embedding <=> $query LIMIT 5
+-- No ANN index: migration 005 dropped the ivfflat index (built on an empty
+--   table, never rebuilt). At 46 rows an exact scan `ORDER BY embedding <=> $q
+--   LIMIT 5` is sub-millisecond. Add HNSW only past a few thousand rows.
 
--- Chatbot interaction logs — feeds website live metrics
+-- Chatbot interaction logs — feeds the website's live metrics dashboard
 interactions (id UUID, question TEXT, answer TEXT, latency_ms INT,
-              rating INT CHECK (1–5), created_at TIMESTAMPTZ)
+              rating INT CHECK (rating BETWEEN 1 AND 5), created_at TIMESTAMPTZ)
+-- rag-chatbot only ever writes rating = 1 (thumbs down) or 5 (thumbs up).
 ```
 
 ### Extensibility Rule
 To add a new data type (e.g. certifications, publications, talks):
-1. Add a new migration file in `migrations/`
+1. Add a new migration file in `migrations/` (next number — 006)
 2. Add a seed file in `seeds/`
-3. Add chunks to `scripts/embed.py` → re-run → re-run `seeds/knowledge_base.sql`
-4. No other repo needs to change — the chatbot and website pick it up automatically
+3. Add chunks to `scripts/embed.py` → `python scripts/embed.py` → re-run `seeds/knowledge_base.sql`
+4. The chatbot picks it up automatically (retrieval is table-agnostic). The
+   website needs a new query in `src/lib/db.ts` + a component only if the new
+   type should render as its own section.
+
+See `UPDATING.md` for the full content-change workflow.
 
 ---
 
@@ -206,18 +229,24 @@ To add a new data type (e.g. certifications, publications, talks):
 
 ```
 portfolio-store/
-├── migrations/          # Numbered SQL migration files (001_init.sql, 002_add_x.sql...)
-├── seeds/               # One seed file per table
-│   ├── personal_info.sql
-│   ├── skills.sql
-│   ├── experience.sql
-│   ├── education.sql
-│   ├── projects.sql
-│   ├── achievements.sql
-│   └── knowledge_base.sql   # Pre-computed embeddings go here
+├── migrations/          # Append-only, run in filename order
+│   ├── 001_core_tables.sql
+│   ├── 002_enable_pgvector.sql
+│   ├── 003_knowledge_base.sql          # original VECTOR(512) + ivfflat (superseded by 005)
+│   ├── 004_update_featured_projects.sql
+│   ├── 005_gemini_embeddings.sql       # drop ivfflat, VECTOR(512 -> 768) for Gemini
+│   └── 006_project_metadata_fixes.sql  # rename GPU project; correct RAG chatbot row (Voyage->Gemini, gpt-oss-120b)
+├── seeds/               # One seed file per table; all upsert (ON CONFLICT DO UPDATE)
+│   ├── personal_info.sql skills.sql experience.sql education.sql projects.sql achievements.sql
+│   └── knowledge_base.sql              # GENERATED by embed.py — 50 chunks, 768-dim Gemini vectors
 ├── scripts/
-│   ├── embed.py         # Generates knowledge_base.sql via Voyage AI voyage-3-lite
-│   └── requirements.txt
-├── schema.sql           # Full schema snapshot (pg_dump, regenerated, not hand-edited)
+│   ├── embed.py                        # generates knowledge_base.sql via Gemini gemini-embedding-001 (stdlib only)
+│   ├── apply_resume_updates.sh         # one-shot: migrations 004+006 + content seeds + knowledge_base reseed
+│   ├── apply_gemini_migration.sh       # one-shot: migration 005 + reseed + verify
+│   └── requirements.txt                # psycopg2-binary, for optional DB tooling only
+├── UPDATING.md          # content-change workflow (DB -> live site)
+├── README.md
 └── CLAUDE.md
 ```
+
+(No committed `schema.sql` — generate on demand with `pg_dump --schema-only`.)

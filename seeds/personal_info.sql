@@ -25,7 +25,7 @@ INSERT INTO personal_info (key, value) VALUES
     --   Wrap a phrase in *asterisks* to render it italic/emphasised.
     ('hero_lede', E'I build for *both sides of the stack* — distributed systems that don''t fall over, and ML infrastructure that actually ships.\nMarketplace platforms at Uber. CUDA kernels & RAG pipelines by night.'),
     -- hero_pills: "|"-separated. Last pill gets the accent ("open") treatment.
-    ('hero_pills', 'software engineer|ml / ai infra|open to ''26 internships'),
+    ('hero_pills', 'software engineer|ml / ai infra|open to new-grad ''27'),
 
     -- ── Website "about" ─────────────────────────────────────────────────────
     -- Paragraph 1 of About is `bio` above. This is paragraph 2.
@@ -34,7 +34,7 @@ INSERT INTO personal_info (key, value) VALUES
     -- ── Website hero "meta" column (the now / reading / … list) ──────────────
     ('now_location', 'Madison, WI'),
     ('now_reading',  'Designing Data-Intensive Apps'),
-    ('now_building', 'IVF-PQ kernel v0.3'),
+    ('now_building', 'GPU kernels & RAG systems'),
     ('now_shooting', 'Fuji X-T4 · Pentax K1000'),
     -- portrait_caption: shown over the hero portrait. Site adds the [ brackets ].
     ('portrait_caption', 'portrait — 35mm, Madison ''26')

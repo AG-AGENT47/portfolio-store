@@ -18,7 +18,10 @@ INSERT INTO education (institution, degree, field, start_date, end_date, gpa, gp
         'Machine Learning (CS 760)',
         'Computational Network Biology (CS 775)',
         'High Performance Computing for Applications in Engineering (CS 759)',
-        'Data Exploration, Cleaning & Integration (CS 774)'
+        'Data Exploration, Cleaning & Integration (CS 774)',
+        'AI Agents',
+        'Next-Generation Data Systems',
+        'Learning-Based Methods for Computer Vision'
     ],
     1
 ),

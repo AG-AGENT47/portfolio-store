@@ -55,3 +55,14 @@ INSERT INTO skills (name, category, proficiency, years_of_experience, display_or
     ('JavaFX',    'framework', 'intermediate', 1, 12),
     ('MySQL',     'tool', 'intermediate', 1, 14)
 ON CONFLICT (name) DO NOTHING;
+
+-- Added from the current resume (Uber Customer Obsession internship + RAG portfolio build)
+INSERT INTO skills (name, category, proficiency, years_of_experience, display_order) VALUES
+    ('Go',                    'language',  'advanced',     1,  8),
+    ('GORM',                  'framework', 'intermediate', 1, 13),
+    ('Protobuf',              'framework', 'advanced',     2, 14),
+    ('Claude Code',           'tool',      'advanced',     1, 15),
+    ('Agentic Development',   'concept',   'advanced',     1,  1),
+    ('Microservices',         'concept',   'advanced',     2,  2),
+    ('Monorepo',              'concept',   'intermediate', 1,  3)
+ON CONFLICT (name) DO NOTHING;

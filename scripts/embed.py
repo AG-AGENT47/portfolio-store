@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-embed.py — Generate seeds/knowledge_base.sql with Voyage AI embeddings.
+embed.py — Generate seeds/knowledge_base.sql with Google Gemini embeddings.
 
 Usage:
-    export VOYAGE_API_KEY=your_key_here
+    export GEMINI_API_KEY=your_key_here
     python scripts/embed.py
 
 Pre-requisite:
-    Sign up at voyageai.com (free) → get API key → set VOYAGE_API_KEY env var.
-    pip install -r scripts/requirements.txt
+    Free Google AI Studio key (no card): https://aistudio.google.com/apikey
+    No pip install needed — this script uses only the Python standard library.
 
 Output:
     seeds/knowledge_base.sql  — committed to the repo so no API call is needed
-    at runtime. The chatbot reads pre-computed vectors, never calls Voyage AI.
+    at runtime. The chatbot reads pre-computed vectors, never calls the embedding API.
 
 Chunking strategy (the most impactful RAG tuning decision):
     Rule: one semantically complete thought = one chunk.
@@ -47,16 +47,43 @@ import sys
 # ---------------------------------------------------------------------------
 CHUNKS = [
     # -----------------------------------------------------------------------
-    # EXPERIENCE: Uber — Summer 2026 (upcoming second internship)
+    # EXPERIENCE: Uber — Summer 2026, Customer Obsession org (second internship)
     # -----------------------------------------------------------------------
     {
         "content": (
-            "Upcoming Summer 2026 Software Engineer Intern at Uber, Hyderabad, India (May 11, 2026). "
-            "Second internship at Uber — returning after the Jul 2024–Jun 2025 internship."
+            "Software Engineer Intern at Uber's Customer Obsession org in Sunnyvale, California "
+            "(May 2026 - Jul 2026) — Avyakt's second Uber internship, after the Jul 2024 - Jun 2025 "
+            "one on Uber AI Solutions. Architected a self-service configuration approval workflow "
+            "end-to-end, eliminating code deploys to onboard new configuration types and replacing "
+            "a manual email-based approval process with an audit trail and per-type RBAC "
+            "(role-based access control) where the prior system had none."
         ),
         "source": "uber_2026_experience",
         "source_type": "experience",
         "metadata": {"company": "Uber", "role": "Software Engineer Intern", "start_date": "2026-05-11"},
+    },
+    {
+        "content": (
+            "Built a transactional draft-to-live promotion flow across 14 gRPC RPCs at Uber "
+            "(Customer Obsession, Sunnyvale, Summer 2026), using pessimistic locking to eliminate "
+            "concurrent write races when promoting configuration drafts to production."
+        ),
+        "source": "uber_2026_experience",
+        "source_type": "experience",
+        "metadata": {"company": "Uber", "role": "Software Engineer Intern", "start_date": "2026-05-11"},
+    },
+
+    # -----------------------------------------------------------------------
+    # EXPERIENCE: UW-Madison Teaching Assistant (current)
+    # -----------------------------------------------------------------------
+    {
+        "content": (
+            "Teaching Assistant at the University of Wisconsin-Madison (started Sep 2026, current) "
+            "for the course Data Management for Data Science."
+        ),
+        "source": "uw_ta_experience",
+        "source_type": "experience",
+        "metadata": {"company": "University of Wisconsin-Madison", "role": "Teaching Assistant", "start_date": "2026-09-02"},
     },
 
     # -----------------------------------------------------------------------
@@ -340,43 +367,72 @@ CHUNKS = [
     },
 
     # -----------------------------------------------------------------------
-    # PROJECTS: GPU-Accelerated ANN Search (HPC CS 759)
+    # PROJECTS: GPU-Accelerated Vector Search Engine (HPC CS 759)
     # -----------------------------------------------------------------------
     {
         "content": (
-            "Implementing IVF-PQ (Inverted File Index with Product Quantization) GPU-accelerated "
-            "approximate nearest neighbor (ANN) search engine in CUDA C/C++ — the same core algorithm "
-            "used by production vector databases FAISS, Milvus, and Pinecone for billion-scale vector "
-            "similarity search (ME/CS/ECE 759 High Performance Computing, Spring 2026). "
+            "Built a 5-stage GPU approximate-nearest-neighbor (ANN) search pipeline in CUDA and OpenMP "
+            "implementing FAISS-style IVF-PQ (Inverted File Index with Product Quantization) — the same "
+            "core algorithm behind FAISS, Milvus, and Pinecone for large-scale vector similarity search "
+            "(GPU-Accelerated Vector Search Engine, ME/CS/ECE 759 High Performance Computing graduate "
+            "project at UW-Madison). Achieved a 127.8x speedup over the CPU baseline. "
             "ANN search is the backbone of RAG pipelines, recommendation systems, and image retrieval."
         ),
         "source": "hpc_project",
         "source_type": "project",
-        "metadata": {"project": "GPU-Accelerated ANN Search with IVF-PQ Indexing", "category": "coursework"},
+        "metadata": {"project": "GPU-Accelerated Vector Search Engine", "category": "coursework"},
     },
     {
         "content": (
-            "Applying GPU performance engineering techniques for IVF-PQ ANN search: shared memory "
-            "optimization for asymmetric distance computation (ADC) lookup tables, memory coalescing "
-            "for PQ code access, warp divergence management for variable-length inverted lists, "
-            "Thrust/CUB for parallel sorting and prefix scan, CUDA streams + OpenMP for CPU-GPU "
-            "pipeline orchestration (CS 759 HPC project, Spring 2026)."
+            "Designed a shared-memory-tiled CUDA kernel for the GPU-Accelerated Vector Search Engine "
+            "that cut global-memory traffic 32x and raised query throughput 6x on 1 million vectors. "
+            "Further cut query latency 1.47x and index build time 2.38x via shared-memory lookup-table "
+            "caching, an OpenMP-parallel k-means for codebook training, and CUDA streams for CPU-GPU "
+            "pipeline overlap (CS 759 HPC graduate project)."
         ),
         "source": "hpc_project",
         "source_type": "project",
-        "metadata": {"project": "GPU-Accelerated ANN Search with IVF-PQ Indexing", "category": "coursework"},
+        "metadata": {"project": "GPU-Accelerated Vector Search Engine", "category": "coursework"},
     },
     {
         "content": (
-            "Benchmarking 5 GPU optimization stages (CPU baseline → naive CUDA → shared memory → "
-            "IVF-PQ naive → IVF-PQ fully optimized) on SIFT1M benchmark dataset (1M vectors, "
-            "128 dimensions). Profiling with NVIDIA Nsight Compute on Euler HPC cluster (Slurm). "
-            "Metrics: queries per second (QPS), Recall@k, and speedup across stages "
-            "(CS 759 HPC project, Spring 2026)."
+            "Benchmarked the GPU-Accelerated Vector Search Engine across 5 optimization stages "
+            "(CPU baseline through fully optimized GPU IVF-PQ) on the SIFT1M dataset (1M vectors, "
+            "128 dimensions), profiling with NVIDIA Nsight Compute on the Euler HPC cluster (Slurm). "
+            "Tracked queries per second, Recall@k, and speedup at each stage (CS 759 HPC graduate project)."
         ),
         "source": "hpc_project",
         "source_type": "project",
-        "metadata": {"project": "GPU-Accelerated ANN Search with IVF-PQ Indexing", "category": "coursework"},
+        "metadata": {"project": "GPU-Accelerated Vector Search Engine", "category": "coursework"},
+    },
+
+    # -----------------------------------------------------------------------
+    # PROJECTS: RAG-Powered Portfolio Chatbot (this system)
+    # -----------------------------------------------------------------------
+    {
+        "content": (
+            "Built the RAG-Powered Portfolio Chatbot — the AI chat on this very portfolio site — as a "
+            "3-repo Go system: portfolio-store (Neon PostgreSQL + pgvector), rag-chatbot (Go API on "
+            "Render), and portfolio-website (Next.js on Vercel). It streams LLM responses over SSE and "
+            "retrieves context with hybrid search: pgvector cosine similarity plus Postgres full-text "
+            "search, merged by Reciprocal Rank Fusion, returning the top 5 chunks per query."
+        ),
+        "source": "portfolio_rag_project",
+        "source_type": "project",
+        "metadata": {"project": "RAG-Powered Portfolio Chatbot", "category": "personal", "live_url": "https://rag-chatbot-qge9.onrender.com"},
+    },
+    {
+        "content": (
+            "The RAG-Powered Portfolio Chatbot uses Google Gemini gemini-embedding-001 (768-dim) for "
+            "query embeddings and a pluggable LLM layer (Groq openai/gpt-oss-120b by default, Gemini as "
+            "fallback) with zero-code provider switching. It adds prompt-injection guardrails, query "
+            "contextualization for pronoun resolution, and a topic filter that redirects off-topic "
+            "questions using the minimum vector distance across retrieved chunks — no LLM call needed. "
+            "Written by Avyakt as a portfolio project demonstrating full-stack AI infrastructure."
+        ),
+        "source": "portfolio_rag_project",
+        "source_type": "project",
+        "metadata": {"project": "RAG-Powered Portfolio Chatbot", "category": "personal"},
     },
 
     # -----------------------------------------------------------------------
@@ -504,10 +560,10 @@ CHUNKS = [
     {
         "content": (
             "M.S. in Computer Science at University of Wisconsin-Madison (Sep 2025 - May 2027), GPA 4.0/4.0. "
-            "Completed courses: CS 540 Intro to Artificial Intelligence (A), CS 760 Machine Learning (A), "
-            "CS 775 Computational Network Biology (A). "
-            "In progress: CS 759 High Performance Computing for Applications in Engineering, "
-            "CS 774 Data Exploration Cleaning and Integration."
+            "Coursework: Intro to Artificial Intelligence (CS 540), Machine Learning (CS 760), "
+            "Computational Network Biology (CS 775), High Performance Computing for Applications in "
+            "Engineering (CS 759), Data Exploration Cleaning and Integration (CS 774), and currently "
+            "AI Agents, Next-Generation Data Systems, and Learning-Based Methods for Computer Vision."
         ),
         "source": "uwmadison_education",
         "source_type": "education",
@@ -580,7 +636,9 @@ CHUNKS = [
         "content": (
             "Programming Languages: Java (expert, 3 years — production use at Uber with SpringBoot), "
             "Python (expert, 4 years — ML research and backend APIs), "
+            "Go (advanced — built the rag-chatbot service and Uber Customer Obsession internship work), "
             "C/C++ (advanced, 3 years — systems programming coursework), "
+            "CUDA (intermediate — GPU kernels), "
             "SQL (intermediate, 3 years — database design and querying), "
             "HTML (intermediate), JavaScript (intermediate), "
             "LaTeX (intermediate, 3 years — used for academic research reports and coursework documentation)."
@@ -592,6 +650,7 @@ CHUNKS = [
     {
         "content": (
             "Frameworks and Libraries: SpringBoot (advanced — Java framework for microservices and REST APIs), "
+            "GORM (intermediate — Go ORM), Protobuf (advanced — Protocol Buffers for gRPC schemas), "
             "TensorFlow (advanced — deep learning), PyTorch (advanced — deep learning and research), "
             "PyTorch Geometric (intermediate — graph neural network library, used for GraphSAGE/Node2Vec), "
             "Scikit-learn (advanced — classical ML), OpenCV (advanced — computer vision), "
@@ -609,6 +668,8 @@ CHUNKS = [
             "gRPC (advanced — RPC framework, used at Uber), REST (advanced — API design), "
             "FastAPI (advanced — Python web framework), Docker (intermediate — containerization), "
             "Git (expert — version control), MVC (advanced — architectural pattern), "
+            "Claude Code and agentic development (advanced — AI-assisted engineering workflows), "
+            "microservices and monorepo architecture (advanced — service and repo design), "
             "Mockito (intermediate — Java unit testing and mocking), "
             "Streamlit (intermediate — data app deployment), "
             "MySQL (intermediate — relational database, used for e-commerce project), "
@@ -638,12 +699,15 @@ CHUNKS = [
     # -----------------------------------------------------------------------
     {
         "content": (
-            "Avyakt Garg — MS CS student at University of Wisconsin-Madison (GPA 4.0) and ex-Uber "
-            "Software Intern. Background spans distributed systems engineering (Kafka, gRPC, SpringBoot "
-            "at Uber) and machine learning research (graph neural networks, medical imaging, IoT). "
+            "Avyakt Garg — MS CS student at University of Wisconsin-Madison (GPA 4.0), two-time Uber "
+            "software engineering intern (AI Solutions in 2024-25, Customer Obsession in Summer 2026), "
+            "and currently a UW-Madison teaching assistant for Data Management for Data Science. "
+            "Background spans distributed systems engineering (Go, Kafka, gRPC, SpringBoot at Uber), "
+            "GPU / HPC programming (CUDA vector search), and machine learning research (graph neural "
+            "networks, medical imaging, IoT), plus full-stack AI infrastructure (RAG pipelines). "
             "Originally from New Delhi, India; BITS Pilani dual-degree graduate (CS + Biological Sciences, "
-            "GPA 9.01/10). MITACS Globalink Scholar. Currently in Madison, Wisconsin, targeting "
-            "software engineering and ML engineering roles at top-tier tech companies."
+            "GPA 9.01/10). MITACS Globalink Scholar. Currently in Madison, Wisconsin, open to new-grad "
+            "software and ML engineering roles for 2027."
         ),
         "source": "personal_bio",
         "source_type": "personal",
