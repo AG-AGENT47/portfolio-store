@@ -655,41 +655,65 @@ CHUNKS = [
 # Embedding generation
 # ---------------------------------------------------------------------------
 
-def generate_embeddings(chunks: list[dict]) -> list[dict]:
-    """Call Voyage AI API to generate 1024-dim embeddings for all chunks."""
-    api_key = os.environ.get("VOYAGE_API_KEY")
-    if not api_key:
-        print("ERROR: VOYAGE_API_KEY environment variable is not set.")
-        print("  Sign up at voyageai.com (free) → get API key → export VOYAGE_API_KEY=...")
-        sys.exit(1)
+import json as _json
+import urllib.error
+import urllib.request
 
-    try:
-        import voyageai
-    except ImportError:
-        print("ERROR: voyageai not installed. Run: pip install -r scripts/requirements.txt")
-        sys.exit(1)
+# Google Gemini embeddings — free tier ~100 RPM (vs Voyage voyage-3-lite's 3 RPM
+# once the trial credit is spent, which is what took the chatbot offline).
+# The query side lives in rag-chatbot/internal/rag/embedder.go and MUST stay on
+# the same model + dimensionality + task-type pairing.
+EMBED_MODEL = "gemini-embedding-001"
+EMBED_DIMS = 768
+EMBED_URL = (
+    f"https://generativelanguage.googleapis.com/v1beta/models/{EMBED_MODEL}:embedContent"
+)
 
-    client = voyageai.Client(api_key=api_key)
 
-    texts = [c["content"] for c in chunks]
-    print(f"Generating embeddings for {len(texts)} chunks via Voyage AI voyage-3-lite...")
-
-    # Voyage AI supports batching; batch in groups of 128 to stay within limits
-    batch_size = 128
-    all_embeddings = []
-    for i in range(0, len(texts), batch_size):
-        batch = texts[i : i + batch_size]
-        result = client.embed(batch, model="voyage-3-lite", input_type="document")
-        all_embeddings.extend(result.embeddings)
-        print(f"  Embedded {min(i + batch_size, len(texts))}/{len(texts)} chunks")
-
-    assert len(all_embeddings) == len(chunks), "Embedding count mismatch"
-    assert len(all_embeddings[0]) == 512, (
-        f"Expected 512-dim vectors from voyage-3-lite, got {len(all_embeddings[0])}"
+def _embed_one(text: str, api_key: str) -> list[float]:
+    body = _json.dumps(
+        {
+            "model": f"models/{EMBED_MODEL}",
+            "content": {"parts": [{"text": text}]},
+            # Documents are RETRIEVAL_DOCUMENT; the chatbot embeds queries as
+            # RETRIEVAL_QUERY. The asymmetry is deliberate and improves recall.
+            "taskType": "RETRIEVAL_DOCUMENT",
+            "outputDimensionality": EMBED_DIMS,
+        }
+    ).encode()
+    req = urllib.request.Request(
+        EMBED_URL,
+        data=body,
+        headers={"Content-Type": "application/json", "x-goog-api-key": api_key},
+        method="POST",
     )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            payload = _json.loads(resp.read())
+    except urllib.error.HTTPError as e:
+        raise SystemExit(f"Gemini embed HTTP {e.code}: {e.read().decode()[:400]}")
+    values = payload.get("embedding", {}).get("values")
+    if not values:
+        raise SystemExit(f"Gemini embed: no values in response: {_json.dumps(payload)[:400]}")
+    return values
 
-    for chunk, embedding in zip(chunks, all_embeddings):
-        chunk["embedding"] = embedding
+
+def generate_embeddings(chunks: list[dict]) -> list[dict]:
+    """Generate {EMBED_DIMS}-dim embeddings for all chunks via Google Gemini."""
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        print("ERROR: GEMINI_API_KEY environment variable is not set.")
+        print("  Free key (no card): https://aistudio.google.com/apikey")
+        sys.exit(1)
+
+    print(f"Generating embeddings for {len(chunks)} chunks via Gemini {EMBED_MODEL} ({EMBED_DIMS}d)...")
+    for i, chunk in enumerate(chunks, 1):
+        chunk["embedding"] = _embed_one(chunk["content"], api_key)
+        assert len(chunk["embedding"]) == EMBED_DIMS, (
+            f"Expected {EMBED_DIMS}-dim vectors, got {len(chunk['embedding'])}"
+        )
+        if i % 10 == 0 or i == len(chunks):
+            print(f"  Embedded {i}/{len(chunks)} chunks")
 
     return chunks
 
@@ -710,7 +734,7 @@ def write_sql(chunks: list[dict], output_path: str) -> None:
         "-- GENERATED FILE — do not edit by hand.",
         "-- Regenerate: python scripts/embed.py",
         "--",
-        "-- Embeddings: Voyage AI voyage-3-lite (1024 dimensions)",
+        f"-- Embeddings: Google Gemini {EMBED_MODEL} ({EMBED_DIMS} dimensions, taskType=RETRIEVAL_DOCUMENT)",
         "-- Chunks: " + str(len(chunks)),
         "--",
         "-- Truncate existing rows before re-seeding (vectors are deterministic for",

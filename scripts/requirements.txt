@@ -1,2 +1,4 @@
-voyageai>=0.3.0
+# embed.py uses only the Python standard library (urllib) to call the Gemini
+# REST API — no third-party packages required. This file is kept for the
+# optional psql/DB tooling some contributors run alongside it.
 psycopg2-binary>=2.9.0
