@@ -76,7 +76,7 @@ INSERT INTO projects (title, category, description, bullets, tech_stack, github_
         "Implemented frequency-based prediction dictionary in Python Tkinter: the most-used formulas automatically rise to the top; GUI shows all possible symbol combinations and live predictions on each keypress"
     ]'::jsonb,
     ARRAY['Python', 'Tkinter'],
-    NULL,
+    'https://github.com/AG-AGENT47/t9-formula-entry',
     NULL,
     'Dr. Mukesh Kumar Rohil',
     FALSE,
@@ -107,7 +107,7 @@ INSERT INTO projects (title, category, description, bullets, tech_stack, github_
         "Designed a Python Tkinter GUI (desktop graphical user interface) for order tracking, payment history, and customer feedback workflows"
     ]'::jsonb,
     ARRAY['MySQL', 'Python', 'Tkinter'],
-    NULL,
+    'https://github.com/AG-AGENT47/ecommerce-management-system',
     NULL,
     NULL,
     FALSE,
@@ -123,7 +123,7 @@ INSERT INTO projects (title, category, description, bullets, tech_stack, github_
         "Implemented comprehensive exception handling with a dedicated ExceptionHandling package; built JavaFX GUI controllers for interactive card rendering and study session management"
     ]'::jsonb,
     ARRAY['Java', 'JavaFX'],
-    NULL,
+    'https://github.com/AG-AGENT47/flashcard-application',
     NULL,
     NULL,
     FALSE,
@@ -154,7 +154,7 @@ INSERT INTO projects (title, category, description, bullets, tech_stack, github_
         "Designed and implemented supporting ADTs in C: SET ADT for FIRST/FOLLOW sets, Stack ADT for parsing, Parse Tree ADT, and file reader for grammar specification — built with Makefile; code compiled with zero errors and no segmentation faults across all test cases"
     ]'::jsonb,
     ARRAY['C', 'Makefile'],
-    NULL,
+    'https://github.com/AG-AGENT47/compiler-construction',
     NULL,
     'Aryaman Chauhan, Devansh, Arnav Gujarathi, Akshaj Dixit, Tanushi Garg',
     FALSE,
